@@ -15,10 +15,10 @@ function getResolver(type) {
     }
 
     var pkAlias = typeData.primaryKey ? typeData.aliases[typeData.primaryKey] : null;
-    return function resolveEntity(parent, args, ast) {
+    return function resolveEntity(parent, args, ctx, ast) {
         var isList = ast.returnType instanceof GraphQL.GraphQLList;
         var clauses = getClauses(ast, args, typeData.aliases);
-        var selection = getSelectionSet(type, ast.fieldASTs[0], typeData.aliases, typeData.referenceMap);
+        var selection = getSelectionSet(type, ast.fieldNodes[0], typeData.aliases, typeData.referenceMap);
         var hasPkSelected =
             typeData.primaryKey &&
             selection.some(function(item) {

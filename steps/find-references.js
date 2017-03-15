@@ -20,15 +20,16 @@ function findReferencesForModel(model, models) {
 
     // Filter the columns that have a corresponding model
     return refs.reduce(function(references, col) {
-        var colName = col.name.substr(0, col.name.length - 2).replace(/^parent/, '');
+        //var colName = col.name.substr(0, col.name.length - 2).replace(/^parent/, '');
+        var colName = col.name.substr(3, col.name.length);
         var parts = snakeCase(colName).split('_'), fieldName;
 
         do {
             var name = parts.map(capitalize).join('');
 
             // Do we have a match for this?
-            if (models[name]) {
-                fieldName = col.name.replace(/Id$/, '');
+            if (models["Pthdbo"+name]) {
+                fieldName = col.name.replace('tfk', 'tpk');
 
                 // If we collide with a different field name, add a "Ref"-suffix
                 if (fields.indexOf(fieldName) !== -1) {
@@ -36,7 +37,7 @@ function findReferencesForModel(model, models) {
                 }
 
                 references.push({
-                    model: models[name],
+                    model: models["Pthdbo"+name],
                     field: fieldName,
                     refField: col.name
                 });
@@ -52,7 +53,8 @@ function findReferencesForModel(model, models) {
 }
 
 function isIdColumn(col) {
-    return !col.isPrimaryKey && col.name.substr(-2) === 'Id';
+    //return !col.isPrimaryKey && col.name.substr(0, 3) === 'tfk';
+    return !col.isPrimaryKey && col.name.search('tfk') !== -1;
 }
 
 module.exports = findReferences;

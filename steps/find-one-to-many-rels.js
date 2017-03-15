@@ -26,7 +26,10 @@ function findRelationships(adapter, model, models, callback) {
     var done = after(model.references.length, callback);
     model.references.forEach(function(ref) {
         var referenceColumn = getUnaliasedField(ref.refField, model);
-        adapter.hasDuplicateValues(model.table, referenceColumn, function(err, hasDupes) {
+        // cheating!
+        //return done(null, model);
+        //adapter.hasDuplicateValues(model.table, referenceColumn, function(err, hasDupes) {
+        adapter.hasDuplicateValues(model.table, ref.refField, function(err, hasDupes) {
             if (err) {
                 return callback(err);
             }
@@ -58,6 +61,8 @@ function findRelationships(adapter, model, models, callback) {
     });
 }
 
+
+// here
 function getUnaliasedField(field, model) {
     for (var unaliased in model.aliasedFields) {
         if (model.aliasedFields[unaliased] === field) {
