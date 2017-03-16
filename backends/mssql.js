@@ -10,29 +10,24 @@ var camelCase = require('lodash/string/camelCase');
 var undef;
 
 module.exports = function mssqlBackend(opts, cb) {
-    var up = '';
-    if (opts.user !== 'root' || opts.password) {
-        up = opts.user + ':' + opts.password + '@';
-    }
+    //var up = '';
+    //if (opts.user !== 'root' || opts.password) {
+    //    up = opts.user + ':' + opts.password + '@';
+    //}
 
-    //var port = opts.port === 3306 ? '' : ':' + opts.port;
+    //var port = opts.port === 1433 ? '' : ':' + opts.port;
     //var conString = 'postgres://' + up + opts.host + port + '/' + opts.db;
 
-    //var pgSchemas = ['pg_catalog', 'pg_statistic', 'information_schema'];
     var mssql = knex({
         client: 'mssql',
         connection: {
-            //host : '127.0.0.1',
-            server: opts.host, //'127.0.0.1',
-            port: opts.port, //'1433',
-            user : opts.user, //'graphql_t',
-            password : opts.password, //'graphql_t',
-            database : opts.db //'pw_acr'
+            server: opts.host,
+            port: opts.port,
+            user : opts.user,
+            password : opts.password,
+            database : opts.db
         }
     });
-
-    //mssql('INFORMATION_SCHEMA.TABLES')
-                //.distinct('TABLE_NAME');
 
     process.nextTick(cb);
 
@@ -46,11 +41,8 @@ module.exports = function mssqlBackend(opts, cb) {
                     table_catalog: opts.db,
                     table_type: 'BASE TABLE'
                 })
-                //.whereNotIn('table_schema', mssqlSchemas)
                 .then(function(tbls) {
-                    //var schemaTables = tbls.map(function (d, p) {
-                        //return ''
-                    //});
+                    // We want to get the schema name too
                     var schemaTables = tbls.map(function(tbl){
                         return tbl['TABLE_SCHEMA'] + '.' + tbl['TABLE_NAME'];
                     });
@@ -69,10 +61,6 @@ module.exports = function mssqlBackend(opts, cb) {
 
         getTableComment: function(tableName, tblCb) {
             tblCb(null, '');
-            //var q = 'SELECT obj_description(?::regclass, \'pg_class\') AS table_comment';
-            //mssql.raw(q, [tableName]).then(function(info) {
-            //    tblCb(null, ((info || [])[0] || {}).table_comment || undef);
-            //}).catch(tblCb);
         },
 
         getTableStructure: function(tableName, tblCb) {
@@ -84,7 +72,6 @@ module.exports = function mssqlBackend(opts, cb) {
                     table_name: schemaTable[1],
                     table_schema: schemaTable[0]
                 })
-                //.whereNotIn('table_schema', pgSchemas)
                 .orderBy('ordinal_position', 'asc')
                 .catch(tblCb)
                 .then(function(columns) {
@@ -105,7 +92,6 @@ module.exports = function mssqlBackend(opts, cb) {
                                 table_schema: schemaTable[0],
                                 constraint_type: 'PRIMARY KEY'
                             });
-                            //.whereNotIn('table_schema', pgSchemas);
 
                         mssql.first('column_name AS primary_key')
                             .from('information_schema.key_column_usage')
@@ -115,7 +101,6 @@ module.exports = function mssqlBackend(opts, cb) {
                                 table_schema: schemaTable[0],
                                 constraint_name: subQuery
                             })
-                            //.whereNotIn('table_schema', pgSchemas)
                             .then(function(pk) {
                                 var pkCol = (pk || {}).primary_key;
                                 columns = columns.map(function(col) {

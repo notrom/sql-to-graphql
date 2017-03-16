@@ -52,7 +52,7 @@ function findRelationships(adapter, model, models, callback) {
                 model: model,
                 description: description,
                 field: refName,
-                refField: referenceColumn,
+                refField: ref.refField,
                 isList: true
             });
 
