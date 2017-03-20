@@ -67,6 +67,7 @@ function getType(col) {
         case 'mediumblob':
         case 'binary':
         case 'varbinary':
+        case 'image':
 
         // Numbers that may exceed float precision, repesent as string
         case 'bigint':
